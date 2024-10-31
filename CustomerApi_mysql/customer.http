@@ -1,0 +1,6 @@
+@customer_HostAddress = http://localhost:5260
+
+GET {{customer_HostAddress}}/swagger/
+Accept: application/json
+
+###

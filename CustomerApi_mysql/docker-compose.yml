@@ -1,0 +1,16 @@
+services:
+  customer_mysql:
+    image: customer_mysql
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_CONNECTION_STRING: "server=mysql9;port=3306;database=crud;user=root;password=wind2009;"
+    ports:
+      - "7020:8080"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    external: true

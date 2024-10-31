@@ -1,0 +1,24 @@
+﻿# 使用 SDK 镜像进行构建
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# 复制 .csproj 文件并恢复依赖项
+COPY ["CustomerApi.csproj", "."]
+RUN dotnet restore
+
+# 复制所有源代码并构建项目
+COPY . .
+RUN dotnet build "CustomerApi.csproj" -c Release -o /app/build
+
+# 发布项目
+FROM build AS publish
+RUN dotnet publish "CustomerApi.csproj" -c Release -o /app/publish
+
+# 使用 ASP.NET Core 运行时镜像
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+# 复制发布的应用程序
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "CustomerApi.dll"]

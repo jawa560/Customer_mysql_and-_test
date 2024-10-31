@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerApi.Tests", "CustomerApi.Tests\CustomerApi.Tests.csproj", "{38563B65-4762-4187-9860-8FED0195B07A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerApi", "CustomerApi_mysql\CustomerApi.csproj", "{CA13FA3E-4DC8-4D91-AB59-F4CFA076F04C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38563B65-4762-4187-9860-8FED0195B07A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38563B65-4762-4187-9860-8FED0195B07A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38563B65-4762-4187-9860-8FED0195B07A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38563B65-4762-4187-9860-8FED0195B07A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA13FA3E-4DC8-4D91-AB59-F4CFA076F04C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA13FA3E-4DC8-4D91-AB59-F4CFA076F04C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA13FA3E-4DC8-4D91-AB59-F4CFA076F04C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA13FA3E-4DC8-4D91-AB59-F4CFA076F04C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54A0A460-C50C-45F8-B51E-FA0B238F70D6}
+	EndGlobalSection
+EndGlobal
