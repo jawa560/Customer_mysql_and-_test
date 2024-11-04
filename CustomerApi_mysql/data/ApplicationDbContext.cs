@@ -1,4 +1,4 @@
-﻿using CustomerApi.data;
+﻿using CustomerApi.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerApi.Data

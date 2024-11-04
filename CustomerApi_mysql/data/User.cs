@@ -1,4 +1,4 @@
-﻿namespace CustomerApi.data
+﻿namespace CustomerApi.Data
 {
     public class User
     {

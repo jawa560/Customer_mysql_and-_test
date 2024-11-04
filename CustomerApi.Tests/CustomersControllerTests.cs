@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using CustomerApi.data;
+using Microsoft.AspNetCore.TestHost;
 
 namespace CustomerApi.Tests
 {
@@ -25,10 +26,7 @@ namespace CustomerApi.Tests
         private readonly string _token;
 
         private readonly CustomWebApplicationFactory<Program> _factory;
-        //public CustomersControllerTests(CustomWebApplicationFactory<Program> factory)
-        //{
-        //    _factory = factory;
-        //}
+       
         public CustomersControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
@@ -56,10 +54,9 @@ namespace CustomerApi.Tests
             // Seed the database with test data
             _context.Users.AddRange(new List<User>
             {
-                new User { Id = 1, Username = "james", Password = "1234", Role = "User" },
-                new User { Id = 2, Username = "god", Password = "123456", Role = "Admin" },
-                new User { Id = 3, Username = "user", Password = "password", Role = "User" },
-                new User { Id = 4, Username = "admin", Password = "password", Role = "Admin" },
+             
+                new User { Id = 1, Username = "user", Password = "password", Role = "User" },
+                new User { Id = 2, Username = "admin", Password = "password", Role = "Admin" },
             });
             _context.Customers.AddRange(new List<Customer>
             {
@@ -87,6 +84,13 @@ namespace CustomerApi.Tests
 
             return responseObject.Token;
         }
+        private async Task<string> LoginAsync(string username, string password)
+        {
+            var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new { Username = username, Password = password });
+            loginResponse.EnsureSuccessStatusCode();
+            var tokenResponse = await loginResponse.Content.ReadFromJsonAsync<TokenResponse>();
+            return tokenResponse.Token;
+        }
         private async Task<string> GetJwtToken(string username, string password)
         {
             var client = _factory.CreateClient();
@@ -103,7 +107,7 @@ namespace CustomerApi.Tests
         {
             // Arrange
             var client = _factory.CreateClient();
-            var token = await GetJwtToken("james", "1234");
+            var token = await GetJwtToken("user", "password");
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -120,7 +124,7 @@ namespace CustomerApi.Tests
         {
             // Arrange
             var client = _factory.WithWebHostBuilder(builder => { }).CreateClient();
-            var token = await GetJwtToken("james", "1234");
+            var token = await GetJwtToken("user", "password");
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -138,7 +142,7 @@ namespace CustomerApi.Tests
         {
             // Arrange
             var client = _factory.WithWebHostBuilder(builder => { }).CreateClient();
-            var token = await GetJwtToken("james", "1234");
+            var token = await GetJwtToken("user", "password");
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -153,7 +157,7 @@ namespace CustomerApi.Tests
         {
             // Arrange
             var client = _factory.WithWebHostBuilder(builder => { }).CreateClient();
-            var token = await GetJwtToken("james", "1234");
+            var token = await GetJwtToken("user", "password");
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var newCustomer = new Customer { Name = "New Customer", Birthday = DateOnly.FromDateTime(new DateTime(2000, 3, 3)), Gender = "Male", Address = "789 Road", Phone = "1112223333", Note1 = "Note1", Note2 = "Note2" };
@@ -216,10 +220,15 @@ namespace CustomerApi.Tests
         public async Task DeleteCustomer_RemovesCustomerById()
         {
             // Arrange
-            var client = _factory.WithWebHostBuilder(builder => { }).CreateClient();
-            var token = await GetJwtToken("user", "password");
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            
+            //var client = _factory.WithWebHostBuilder(builder => { }).CreateClient();
+            //var client = _factory.CreateClient();
+            //var token = await GetJwtToken("user", "password");
+            //client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var token = await LoginAsync("testuser", "password");
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
             // Detach the existing entity
             var existingCustomer = await _context.Customers.FindAsync(1);
             if (existingCustomer != null)
@@ -240,7 +249,7 @@ namespace CustomerApi.Tests
         {
             // Arrange
             var client = _factory.WithWebHostBuilder(builder => { }).CreateClient();
-            var token = await GetJwtToken("james", "1234");
+            var token = await GetJwtToken("user", "password");
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             // Detach the existing entity

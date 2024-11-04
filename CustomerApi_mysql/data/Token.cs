@@ -1,7 +1,4 @@
-﻿using CustomerApi.Data;
-using Microsoft.EntityFrameworkCore;
-
-namespace CustomerApi.Data
+﻿namespace CustomerApi.Data
 {
     public class Token
     {

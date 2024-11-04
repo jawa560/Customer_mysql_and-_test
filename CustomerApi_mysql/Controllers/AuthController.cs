@@ -4,7 +4,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using CustomerApi.data;
 using CustomerApi.Data;
 
 namespace CustomerApi.Controllers
