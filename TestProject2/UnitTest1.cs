@@ -21,44 +21,48 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
     {
         builder.ConfigureServices(services =>
         {
-            //// 配置 MySQL 數據庫
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //{
-            //    options.UseMySql("Server=localhost;Database=crud;User=root;Password=wind2009;",
-            //        new MySqlServerVersion(new Version(8, 0, 21)));
-                
-            //});
-            
-            //// 建立數據庫範圍
-            //var serviceProvider = services.BuildServiceProvider();
-            //using (var scope = serviceProvider.CreateScope())
-            //{
-            //    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                
-                
+            // 配置 MySQL 數據庫
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseMySql("Server=localhost;Database=crud;User=root;Password=wind2009;",
+                    new MySqlServerVersion(new Version(8, 0, 21)));
 
-            //    // 清除資料庫並插入測試資料
-            //    db.Database.EnsureDeleted();
-            //    db.Database.EnsureCreated();
+            });
 
-            //    // 插入初始數據
-            //    if (!db.Users.Any())
-            //    {
-            //        db.Users.Add(new User { Username = "user", Password = "password", Role = "User" });
-            //        db.Users.Add(new User { Username = "admin", Password = "password", Role = "Admin" });
-            //        db.SaveChanges();
-            //    }
-            //    if (!db.Customers.Any())
-            //    {
-            //        // 添加測試用戶數據
-            //        db.Customers.Add(new Customer { Id = 1, Name = "John Doe", Birthday = DateOnly.FromDateTime(new DateTime(1990, 1, 1)), Gender = "Male", Address = "123 Street", Phone = "1234567890", Note1 = "aaaaaaaaaa", Note2 = "1111111111111111" });
-            //        db.Customers.Add(new Customer { Id = 2, Name = "Jane Doe", Birthday = DateOnly.FromDateTime(new DateTime(1995, 2, 2)), Gender = "Female", Address = "456 Avenue", Phone = "0987654321", Note1 = "bbbbbbbbbbbb", Note2 = "2222222222222" });
-            //        db.SaveChanges();
-            //    }
-            //}
+            // 建立數據庫範圍
+            var serviceProvider = services.BuildServiceProvider();
+            using (var Transient = GetTransient(serviceProvider))
+            {
+                var db = Transient.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+
+
+                // 清除資料庫並插入測試資料
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+
+                // 插入初始數據
+                if (!db.Users.Any())
+                {
+                    db.Users.Add(new User { Username = "user", Password = "password", Role = "User" });
+                    db.Users.Add(new User { Username = "admin", Password = "password", Role = "Admin" });
+                    db.SaveChanges();
+                }
+                if (!db.Customers.Any())
+                {
+                    // 添加測試用戶數據
+                    db.Customers.Add(new Customer { Id = 1, Name = "John Doe", Birthday = DateOnly.FromDateTime(new DateTime(1990, 1, 1)), Gender = "Male", Address = "123 Street", Phone = "1234567890", Note1 = "aaaaaaaaaa", Note2 = "1111111111111111" });
+                    db.Customers.Add(new Customer { Id = 2, Name = "Jane Doe", Birthday = DateOnly.FromDateTime(new DateTime(1995, 2, 2)), Gender = "Female", Address = "456 Avenue", Phone = "0987654321", Note1 = "bbbbbbbbbbbb", Note2 = "2222222222222" });
+                    db.SaveChanges();
+                }
+            }
         });
     }
-    
+
+    private static IServiceScope GetTransient(ServiceProvider serviceProvider)
+    {
+        return serviceProvider.CreateScope();
+    }
 }
 
 public class CustomerControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
@@ -74,53 +78,53 @@ public class CustomerControllerTests : IClassFixture<CustomWebApplicationFactory
         _factory = factory;
         _client = _factory.CreateClient();
         /// 使用 WebApplicationFactory 來創建 ApplicationDbContext 實例
-        var scope = _factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        _context = scopedServices.GetRequiredService<ApplicationDbContext>();
+        //var scope = _factory.Services.CreateScope();
+        //var scopedServices = scope.ServiceProvider;
+        //_context = scopedServices.GetRequiredService<ApplicationDbContext>();
 
-        _client = _factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                // 配置 MySQL 數據庫
-                var configuration = new ConfigurationBuilder()
-                    .AddEnvironmentVariables()
-                    .Build();
-                var connectionString = configuration["MYSQL_CONNECTION_STRING"];
+        //_client = _factory.WithWebHostBuilder(builder =>
+        //{
+        //    builder.ConfigureServices(services =>
+        //    {
+        //        // 配置 MySQL 數據庫
+        //        var configuration = new ConfigurationBuilder()
+        //            .AddEnvironmentVariables()
+        //            .Build();
+        //        var connectionString = configuration["MYSQL_CONNECTION_STRING"];
                 
-                // 配置 MySQL 數據庫
-                services.AddDbContext<ApplicationDbContext>(options =>
-                {
-                    options.UseMySql(connectionString,
-                        new MySqlServerVersion(new Version(8, 0, 21)));
-                });
+        //        // 配置 MySQL 數據庫
+        //        services.AddDbContext<ApplicationDbContext>(options =>
+        //        {
+        //            options.UseMySql(connectionString,
+        //                new MySqlServerVersion(new Version(8, 0, 21)));
+        //        });
 
-                // 建立數據庫範圍
-                var serviceProvider = services.BuildServiceProvider();
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    db.Database.EnsureDeleted();
-                    db.Database.EnsureCreated();
-                    if (!db.Users.Any())
-                    {
-                        // 添加測試用戶數據
-                        db.Users.Add(new User { Username = "user", Password = "password", Role = "User" });
-                        db.Users.Add(new User { Username = "admin", Password = "password", Role = "Admin" });
-                        db.SaveChanges();
-                    }
-                    if (!db.Customers.Any())
-                    {
-                        // 添加測試用戶數據
-                        db.Customers.Add(new Customer { Id = 1, Name = "John Doe", Birthday = DateOnly.FromDateTime(new DateTime(1990, 1, 1)), Gender = "Male", Address = "123 Street", Phone = "1234567890", Note1 = "aaaaaaaaaa", Note2 = "1111111111111111" });
-                        db.Customers.Add(new Customer { Id = 2, Name = "Jane Doe", Birthday = DateOnly.FromDateTime(new DateTime(1995, 2, 2)), Gender = "Female", Address = "456 Avenue", Phone = "0987654321", Note1 = "bbbbbbbbbbbb", Note2 = "2222222222222" });
-                        db.SaveChanges();
-                    }
+        //        // 建立數據庫範圍
+        //        var serviceProvider = services.BuildServiceProvider();
+        //        using (var scope = serviceProvider.CreateScope())
+        //        {
+        //            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        //            db.Database.EnsureDeleted();
+        //            db.Database.EnsureCreated();
+        //            if (!db.Users.Any())
+        //            {
+        //                // 添加測試用戶數據
+        //                db.Users.Add(new User { Username = "user", Password = "password", Role = "User" });
+        //                db.Users.Add(new User { Username = "admin", Password = "password", Role = "Admin" });
+        //                db.SaveChanges();
+        //            }
+        //            if (!db.Customers.Any())
+        //            {
+        //                // 添加測試用戶數據
+        //                db.Customers.Add(new Customer { Id = 1, Name = "John Doe", Birthday = DateOnly.FromDateTime(new DateTime(1990, 1, 1)), Gender = "Male", Address = "123 Street", Phone = "1234567890", Note1 = "aaaaaaaaaa", Note2 = "1111111111111111" });
+        //                db.Customers.Add(new Customer { Id = 2, Name = "Jane Doe", Birthday = DateOnly.FromDateTime(new DateTime(1995, 2, 2)), Gender = "Female", Address = "456 Avenue", Phone = "0987654321", Note1 = "bbbbbbbbbbbb", Note2 = "2222222222222" });
+        //                db.SaveChanges();
+        //            }
 
 
-                }
-            });
-        }).CreateClient();
+        //        }
+        //    });
+        //}).CreateClient();
     }
     public class TokenResponse
     {
